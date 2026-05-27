@@ -21,7 +21,7 @@ All data comes from the JSON Claude Code passes to the status line command on st
 ## Install
 
 ```bash
-git clone https://github.com/<you>/cc-usage-statusline.git
+git clone https://github.com/Tespera/cc-usage-statusline.git
 cd cc-usage-statusline
 ./install.sh
 ```
