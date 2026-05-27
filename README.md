@@ -2,9 +2,9 @@
 
 A [Claude Code](https://claude.com/claude-code) status line that shows your **5-hour** and **7-day** rate-limit usage on the right, plus the model name and context-window usage on the left.
 
-```
-[Opus 4.7] 64% context                              5h 17% 3h29m | 7d 85% 11h39m
-```
+## Preview
+
+![preview](preview.png)
 
 - **Left** — model name + context-window % (the same info cc shows by default).
 - **Right** — 5h / 7d utilization with reset countdowns, right-aligned and color-coded:
