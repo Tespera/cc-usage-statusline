@@ -9,6 +9,9 @@ A [Claude Code](https://claude.com/claude-code) status line that shows your **5-
 - **Left** — model name + context-window % (the same info cc shows by default).
 - **Right** — 5h / 7d utilization with reset countdowns, right-aligned and color-coded:
   - green `< 50%`, yellow `50–79%`, red `>= 80%`.
+  - reset countdowns: the 5-hour shows hours+minutes (e.g. `4h39m`); the 7-day shows days+hours (e.g. `6d8h`), falling back to hours+minutes when under a day.
+
+Example right segment: `5h 7% 4h39m | 7d 6% 6d8h`.
 
 All data comes from the JSON Claude Code passes to the status line command on stdin. **No network calls, no credentials, no cache.**
 
