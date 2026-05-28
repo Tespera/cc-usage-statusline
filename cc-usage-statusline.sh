@@ -43,6 +43,20 @@ time_until() {
   fi
 }
 
+# unix epoch -> "6d8h" / "6d" for the 7-day window; under a day, falls back to
+# the hours+minutes format ("8h45m" / "23m") so precision isn't lost near reset.
+time_until_dh() {
+  local ts=$1 now diff d h
+  if [[ -z "$ts" || "$ts" == "null" || "$ts" == "0" ]]; then printf '%s' "$EMDASH"; return; fi
+  now=$(date +%s); diff=$(( ts - now ))
+  if (( diff <= 0 )); then printf '0m'; return; fi
+  d=$(( diff / 86400 )); h=$(( (diff % 86400) / 3600 ))
+  if   (( d == 0 )); then time_until "$ts"
+  elif (( h == 0 )); then printf '%dd' "$d"
+  else printf '%dd%dh' "$d" "$h"
+  fi
+}
+
 # ---- read stdin JSON ----
 STDIN_JSON=""
 [[ ! -t 0 ]] && STDIN_JSON=$(cat 2>/dev/null || true)
@@ -69,7 +83,7 @@ COLS=$(get_cols)
 # ---- left segment: model + context% ----
 left_plain=""; left=""
 model_name=$(jqv '.model.display_name')
-ctx_pct=$(jqv '.context_window.used_percentage')
+ctx_pct=$(jqv '(.context_window.used_percentage // empty | round)')
 if [[ -n "$model_name" ]]; then
   left_plain="[$model_name]"
   left="$DIM[$model_name]$RESET"
@@ -80,10 +94,10 @@ if [[ -n "$model_name" ]]; then
 fi
 
 # ---- right segment: 5h / 7d rate limits ----
-h5_pct=$(jqv '.rate_limits.five_hour.used_percentage')
-d7_pct=$(jqv '.rate_limits.seven_day.used_percentage')
+h5_pct=$(jqv '(.rate_limits.five_hour.used_percentage // empty | round)')
+d7_pct=$(jqv '(.rate_limits.seven_day.used_percentage // empty | round)')
 h5_reset=$(time_until "$(jqv '.rate_limits.five_hour.resets_at')")
-d7_reset=$(time_until "$(jqv '.rate_limits.seven_day.resets_at')")
+d7_reset=$(time_until_dh "$(jqv '.rate_limits.seven_day.resets_at')")
 
 if [[ -n "$h5_pct" && -n "$d7_pct" ]]; then
   right_plain="5h ${h5_pct}% ${h5_reset} | 7d ${d7_pct}% ${d7_reset}"
